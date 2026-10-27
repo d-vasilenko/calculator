@@ -66,7 +66,7 @@ function main() {
         const result = calculate(parseExpression(trimmedInput));
         console.log(result);
       } catch (error) {
-        console.error((error as Error).message);
+        if (error instanceof Error) console.error((error as Error).message);
       }
 
       askQuestion();
