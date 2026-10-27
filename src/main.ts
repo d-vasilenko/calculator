@@ -5,13 +5,17 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-type Operator = '+' | '-' | '*' | '/';
-const OPERATORS: Operator[] = ['+', '-', '*', '/'];
+const OPERATORS = ['+', '-', '*', '/'] as const;
+type Operator = typeof OPERATORS[number];
 
 interface Input {
   readonly a: number;
   readonly op: Operator;
   readonly b: number;
+}
+
+function isOperator(op: unknown): op is Operator {
+  return typeof op === 'string' && OPERATORS.some(o => o === op);
 }
 
 function parseExpression(input: string): Input {
@@ -22,7 +26,7 @@ function parseExpression(input: string): Input {
   const [a, op, b] = parts;
   const aNum = Number(a);
   const bNum = Number(b);
-  if (!OPERATORS.includes(op as Operator)) {
+  if (!isOperator(op)) {
     throw new Error(`Error: unknown operator ${op}`);
   }
   if (!Number.isFinite(aNum) || !Number.isFinite(bNum)) {
@@ -30,15 +34,12 @@ function parseExpression(input: string): Input {
   }
   return {
     a: aNum,
-    op: op as Operator,
+    op,
     b: bNum,
   };
 }
 
 function calculate(input: Input): number {
-  if (Number.isNaN(input.a) || Number.isNaN(input.b)) {
-    throw new Error('Error: number is NaN!');
-  }
   if (input.op === '/' && input.b === 0) {
     throw new Error('Error: division by zero!');
   }
@@ -47,7 +48,7 @@ function calculate(input: Input): number {
   if (input.op === '*') return input.a * input.b;
   if (input.op === '/') return input.a / input.b;
   const _exhaustive: never = input.op;
-  throw new Error(`Error: unknown operator ${input.op}`);
+  throw new Error(`Error: unknown operator ${_exhaustive}`);
 }
 
 function main() {
@@ -66,7 +67,7 @@ function main() {
         const result = calculate(parseExpression(trimmedInput));
         console.log(result);
       } catch (error) {
-        if (error instanceof Error) console.error((error as Error).message);
+        if (error instanceof Error) console.error(error.message);
       }
 
       askQuestion();
