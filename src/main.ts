@@ -58,14 +58,15 @@ function main() {
 
       if (trimmedInput.toLowerCase() === 'exit') {
         console.log('Goodbye!');
-        rl.close;
+        rl.close();
         return;
       }
     
       try {
-        console.log(parseExpression(trimmedInput));
+        const result = calculate(parseExpression(trimmedInput));
+        console.log(result);
       } catch (error) {
-
+        console.error((error as Error).message);
       }
 
       askQuestion();
