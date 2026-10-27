@@ -5,19 +5,47 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
+type Operator = '+' | '-' | '*' | '/';
+const OPERATORS: Operator[] = ['+', '-', '*', '/'];
+
 interface Input {
-  a: number;
-  op: string;
-  b: number;
+  readonly a: number;
+  readonly op: Operator;
+  readonly b: number;
 }
 
 function parseExpression(input: string): Input {
-  const [a, op, b] = input.split(' ');
+  const parts = input.trim().split(' ');
+  if (parts.length !== 3) {
+    throw new Error('Error: invalid input')
+  }
+  const [a, op, b] = parts;
+  if (!OPERATORS.includes(op as Operator)) {
+    throw new Error(`Error: unknown opertor ${op}`);
+  }
+  if (Number.isFinite(Number(a)) || Number.isFinite(Number(b))) {
+    throw new Error('Error: number is NaN!');
+  }
   return {
     a: Number(a),
-    op: String(op),
+    op: op as Operator,
     b: Number(b),
   };
+}
+
+function calculate(input: Input): number {
+  if (Number.isNaN(input.a) || Number.isNaN(input.b)) {
+    throw new Error('Error: number is NaN!');
+  }
+  if (input.op === '/' && input.b === 0) {
+    throw new Error('Error: division by zero!');
+  }
+  if (input.op === '+') return input.a + input.b;
+  if (input.op === '-') return input.a - input.b;
+  if (input.op === '*') return input.a * input.b;
+  if (input.op === '/') return input.a / input.b;
+  const _exhause: never = input.op;
+  throw new Error(`Error: unknown opertor ${input.op}`);
 }
 
 function main() {
