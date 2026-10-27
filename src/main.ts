@@ -15,21 +15,23 @@ interface Input {
 }
 
 function parseExpression(input: string): Input {
-  const parts = input.trim().split(' ');
+  const parts = input.trim().split(/\s+/);
   if (parts.length !== 3) {
     throw new Error('Error: invalid input')
   }
   const [a, op, b] = parts;
+  const aNum = Number(a);
+  const bNum = Number(b);
   if (!OPERATORS.includes(op as Operator)) {
-    throw new Error(`Error: unknown opertor ${op}`);
+    throw new Error(`Error: unknown operator ${op}`);
   }
-  if (Number.isFinite(Number(a)) || Number.isFinite(Number(b))) {
+  if (!Number.isFinite(aNum) || !Number.isFinite(bNum)) {
     throw new Error('Error: number is NaN!');
   }
   return {
-    a: Number(a),
+    a: aNum,
     op: op as Operator,
-    b: Number(b),
+    b: bNum,
   };
 }
 
@@ -44,8 +46,8 @@ function calculate(input: Input): number {
   if (input.op === '-') return input.a - input.b;
   if (input.op === '*') return input.a * input.b;
   if (input.op === '/') return input.a / input.b;
-  const _exhause: never = input.op;
-  throw new Error(`Error: unknown opertor ${input.op}`);
+  const _exhaustive: never = input.op;
+  throw new Error(`Error: unknown operator ${input.op}`);
 }
 
 function main() {
